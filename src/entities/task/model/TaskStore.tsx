@@ -5,34 +5,43 @@ import {
   getTodos,
   updateTodo,
 } from "@/shared/api/todos/todos";
+import { message } from "antd";
 import { makeAutoObservable, runInAction } from "mobx";
 
 class TaskStore {
   taskList: Todo[] = [];
   task?: Todo;
   isLoading = false;
-  taskListError = "";
-  taskError = "";
+  error = "";
   isUpdateLoading = false;
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  getTaskList = async () => {
-    try {
-      this.isLoading = true;
-      const data = await getTodos();
-
+  _handleError = (error: unknown) => {
+    if (error instanceof Error) {
       runInAction(() => {
-        this.taskList = data;
+        this.error = error.message;
+        message.error(error.message);
       });
+    }
+  };
+
+  private _setTaskList = (tasks: Todo[]) => {
+    runInAction(() => {
+      this.taskList = tasks.sort((a, b) => b.id - a.id);
+    });
+  };
+
+  getTaskList = async () => {
+    this.isLoading = true;
+    this.error = "";
+    try {
+      const data = await getTodos();
+      this._setTaskList(data);
     } catch (error) {
-      if (error instanceof Error) {
-        runInAction(() => {
-          this.taskListError = error.message;
-        });
-      }
+      this._handleError(error);
     } finally {
       runInAction(() => {
         this.isLoading = false;
@@ -40,20 +49,17 @@ class TaskStore {
     }
   };
 
-  getTask = async (id: Todo["id"]) => {
+  getTask = async (id: string) => {
+    this.isLoading = true;
+    this.error = "";
     try {
-      this.isLoading = true;
       const data = await getTodo(id);
 
       runInAction(() => {
         this.task = data;
       });
     } catch (error) {
-      if (error instanceof Error) {
-        runInAction(() => {
-          this.taskError = error.message;
-        });
-      }
+      this._handleError(error);
     } finally {
       runInAction(() => {
         this.isLoading = false;
@@ -62,21 +68,28 @@ class TaskStore {
   };
 
   updateTodo = async (todo: Todo) => {
+    this.isUpdateLoading = true;
+    this.error = "";
     try {
-      this.isUpdateLoading = true;
-      await updateTodo(todo);
+      const data = await updateTodo(todo);
+      const updatedList = this.taskList.map((item) => {
+        if (item.id === data.id) return data;
+        return item;
+      });
+      this._setTaskList(updatedList);
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
+      this._handleError(error);
     } finally {
       runInAction(() => {
-        this.isLoading = false;
+        this.isUpdateLoading = false;
       });
     }
   };
 
   createTodo = async (todo: Omit<Todo, "id">) => {
+    this.isLoading = true;
+    this.error = "";
+
     try {
       const data = await createTodo(todo);
 
@@ -84,9 +97,11 @@ class TaskStore {
         this.taskList.unshift(data);
       });
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
+      this._handleError(error);
+    } finally {
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   };
 }

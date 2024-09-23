@@ -1,0 +1,12 @@
+.card {
+  align-items: center;
+
+  &__title {
+    font-size: 20px !important; 
+
+    &_delete {
+      text-decoration: line-through !important;
+      color: var(--secondary-color) !important;
+    }
+  }
+}

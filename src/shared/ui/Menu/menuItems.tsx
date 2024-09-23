@@ -6,12 +6,12 @@ import Link from "next/link";
 export const menuItems: MenuProps["items"] = [
   {
     label: <Link href="/">Home</Link>,
-    key: "home",
+    key: "/",
     icon: <HomeOutlined />,
   },
   {
     label: <Link href="/todo">Todo</Link>,
-    key: "todo",
+    key: "/todo",
     icon: <CheckSquareOutlined />,
   },
 ];

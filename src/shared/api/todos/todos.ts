@@ -7,7 +7,7 @@ export const getTodos = () => {
   return httpClient.get(SLUG).json<Todo[]>();
 };
 
-export const getTodo = (id: Todo["id"]) => {
+export const getTodo = (id: string) => {
   return httpClient.get(`${SLUG}/${id}`).json<Todo>();
 };
 

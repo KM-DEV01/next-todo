@@ -1,7 +1,6 @@
 import { AppProvider } from "@/app/providers";
 import "@/app/styles";
 import { Menu } from "@/shared/ui/Menu/Menu";
-import { menuItems } from "@/shared/ui/Menu/menuItems";
 import { Layout } from "antd";
 import { Content, Footer, Header } from "antd/es/layout/layout";
 import { Roboto } from "next/font/google";
@@ -17,7 +16,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
         <AppProvider>
           <Layout className={css.layout}>
             <Header className={css.layout__header}>
-              <Menu menuItems={menuItems} />
+              <Menu />
             </Header>
             <Content className={css.layout__content}>{children}</Content>
             <Footer className={css.layout__footer}>

@@ -1,0 +1,20 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__title {
+    font-size: 20px !important;
+    margin: 0;
+
+    &_success {
+      @extend .card__title;
+      color: var(--success-color) !important;
+    }
+
+    &_error {
+      @extend .card__title;
+      color: var(--error-color) !important;
+    }
+  }
+}
