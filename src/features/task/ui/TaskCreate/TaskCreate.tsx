@@ -10,10 +10,7 @@ type FieldType = {
 
 export const TaskCreate = () => {
   const [form] = Form.useForm<FieldType>();
-  const {
-    createTask,
-    status: { error },
-  } = taskFeatures;
+  const { createTask } = taskFeatures;
 
   const onFinish = async ({ task }: FieldType) => {
     const todo = {
@@ -23,7 +20,6 @@ export const TaskCreate = () => {
     };
 
     await createTask(todo);
-    if (error) return;
     form.resetFields(["task"]);
   };
 

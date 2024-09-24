@@ -3,7 +3,6 @@
 import { Todo } from "@/shared/api/todos/model";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 
 import { taskFeatures } from "../../model/taskFeatures";
@@ -15,14 +14,11 @@ interface Props {
 export const TaskComplete = observer(({ task }: Props) => {
   const {
     updateTask,
-    status: { updating, error },
+    status: { updating },
   } = taskFeatures;
 
   const onChange = async (e: CheckboxChangeEvent, task: Todo) => {
-    await updateTask({ ...task, completed: e.target.checked });
-    console.log(toJS(error));
-    if (error) return;
-    console.log(taskFeatures);
+    updateTask({ ...task, completed: e.target.checked });
   };
 
   return (

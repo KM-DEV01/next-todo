@@ -11,7 +11,7 @@ const roboto = Roboto({ subsets: ["cyrillic"], weight: ["400", "700"] });
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="en">
       <body className={roboto.className}>
         <AppProvider>
           <Layout className={css.layout}>
