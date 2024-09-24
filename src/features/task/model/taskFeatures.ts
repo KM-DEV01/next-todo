@@ -1,42 +1,27 @@
+import { taskStore } from "@/entities/task";
 import { Todo } from "@/shared/api/todos/model";
-import { getTodo, getTodos } from "@/shared/api/todos/todos";
+import { createTodo, updateTodo } from "@/shared/api/todos/todos";
 import { StatusStore } from "@/shared/lib/statusStore";
 import { makeAutoObservable, runInAction } from "mobx";
 
-class TaskStore {
+export class TaskFeatures {
   status: StatusStore;
-  private _taskList: Todo[] = [];
-  private _task?: Todo = undefined;
+  private _taskStore: typeof taskStore;
 
   constructor() {
     this.status = new StatusStore();
+    this._taskStore = taskStore;
     makeAutoObservable(this);
   }
 
-  set taskList(value: Todo[]) {
-    this._taskList = value;
-  }
-
-  set task(value: Todo) {
-    this._task = value;
-  }
-
-  get taskList() {
-    return this._taskList;
-  }
-
-  get task(): Todo | undefined {
-    return this._task;
-  }
-
-  getTaskList = async () => {
+  createTask = async (todo: Omit<Todo, "id">) => {
     this.status.loading = true;
     this.status.error = "";
 
-    await getTodos()
+    await createTodo(todo)
       .then((data) => {
         runInAction(() => {
-          this.taskList = data;
+          this._taskStore.taskList = [data, ...this._taskStore.taskList];
         });
       })
       .catch((error) => {
@@ -49,14 +34,18 @@ class TaskStore {
       });
   };
 
-  getTask = async (id: string) => {
-    this.status.loading = true;
+  updateTask = async (task: Todo) => {
+    this.status.updating = true;
     this.status.error = "";
 
-    await getTodo(id)
+    await updateTodo(task)
       .then((data) => {
+        const updatedList = this._taskStore.taskList.map((item) => {
+          if (item.id === data.id) return data;
+          return item;
+        });
         runInAction(() => {
-          this.task = data;
+          this._taskStore.taskList = updatedList;
         });
       })
       .catch((error) => {
@@ -64,10 +53,10 @@ class TaskStore {
       })
       .finally(() => {
         runInAction(() => {
-          this.status.loading = false;
+          this.status.updating = false;
         });
       });
   };
 }
 
-export const taskStore = new TaskStore();
+export const taskFeatures = new TaskFeatures();

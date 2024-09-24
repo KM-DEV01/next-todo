@@ -1,7 +1,8 @@
 "use client";
 
-import { TaskStore } from "@/entities/task";
-import { Button, Form, Input, Space, message } from "antd";
+import { Button, Form, Input, Space } from "antd";
+
+import { taskFeatures } from "../../model/taskFeatures";
 
 type FieldType = {
   task: string;
@@ -9,17 +10,21 @@ type FieldType = {
 
 export const TaskCreate = () => {
   const [form] = Form.useForm<FieldType>();
-  const { createTodo } = TaskStore;
+  const {
+    createTask,
+    status: { error },
+  } = taskFeatures;
 
-  const onFinish = ({ task }: FieldType) => {
+  const onFinish = async ({ task }: FieldType) => {
     const todo = {
       title: task,
       completed: false,
       userId: 1,
     };
 
-    createTodo(todo);
-    message.success("Submit success!");
+    await createTask(todo);
+    if (error) return;
+    form.resetFields(["task"]);
   };
 
   return (

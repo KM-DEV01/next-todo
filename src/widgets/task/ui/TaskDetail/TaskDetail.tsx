@@ -1,15 +1,18 @@
 "use client";
 
-import { TaskDetailCard, TaskStore } from "@/entities/task";
+import { TaskDetailCard, taskStore } from "@/entities/task";
 import { Flex, Spin } from "antd";
-import FrownOutlined from "antd/es/icon";
 import { observer } from "mobx-react-lite";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
 export const TaskDetail = observer(() => {
-  const { getTask, task, isLoading, error } = TaskStore;
+  const {
+    getTask,
+    task,
+    status: { loading, error },
+  } = taskStore;
 
   const param = useParams<{ id: string }>();
 
@@ -19,11 +22,10 @@ export const TaskDetail = observer(() => {
 
   return (
     <Flex gap={8} vertical style={{ width: "100%" }}>
-      <Spin spinning={isLoading} style={{ width: "100%" }}>
+      <Spin spinning={loading} style={{ width: "100%" }}>
         {!error && task && <TaskDetailCard taskCard={task} />}
         {error && (
           <>
-            <FrownOutlined />
             <p>{error}</p>
           </>
         )}
